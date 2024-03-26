@@ -23,4 +23,23 @@ contract Lending{
         require(msg.sender==owner,"Only owner can call this function");
         _;
     }
+
+    modifier onlyborrower(){
+        require(msg.sender==borrower,"Only borrower can call this function");
+        _;
+    }
+
+    function transferownershipback(address _borrower) public onlyowner{
+        borrower=_borrower;
+    }
+
+    function returnasset() public onlyborrower{
+        require(block.timestamp>=returntime,"Return time not reached yet");
+        require(!returned,"Asset already returned");
+        uint interest=(amount*interestrate*(block.timestamp-returntime))/(100*365 days);
+        uint totalamt=amount+interest;
+        payable(owner).transfer(totalamt);
+    }
+
+    receive() external payable {}
 }
